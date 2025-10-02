@@ -20,23 +20,31 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 async function storeTouristData(tourist) {
   try {
     console.log("[DATABASE] Attempting to store tourist data...");
+    console.log("[DATABASE] Itinerary data:", JSON.stringify(tourist.itinerary, null, 2));
+    console.log("[DATABASE] Itinerary type:", typeof tourist.itinerary);
+    console.log("[DATABASE] Itinerary is array:", Array.isArray(tourist.itinerary));
+    
+    // Prepare the data to be inserted
+    const touristDataToInsert = {
+      dtid: tourist.dtid,
+      full_name: tourist.full_name,
+      date_of_birth: tourist.date_of_birth,
+      contact_number: tourist.contact_number,
+      email: tourist.email,
+      emergency_contact_1: tourist.emergency_contact_1,
+      emergency_contact_2: tourist.emergency_contact_2,
+      nationality: tourist.nationality,
+      Trip_Start: tourist.trip_start,
+      Trip_End: tourist.trip_end,
+      id_file_path: tourist.id_file_path,
+      Itinerary: tourist.itinerary || []
+    };
+    
+    console.log("[DATABASE] Data to insert:", JSON.stringify(touristDataToInsert, null, 2));
     
     const { data, error } = await supabase
       .from('tourists')
-      .insert([{
-        dtid: tourist.dtid,
-        full_name: tourist.full_name,
-        date_of_birth: tourist.date_of_birth,
-        contact_number: tourist.contact_number,
-        email: tourist.email,
-        emergency_contact_1: tourist.emergency_contact_1,
-        emergency_contact_2: tourist.emergency_contact_2,
-        nationality: tourist.nationality,
-        Trip_Start: tourist.trip_start, // Note: Capital T and underscore
-        Trip_End: tourist.trip_end,     // Note: Capital T and underscore
-        id_file_path: tourist.id_file_path // Store the uploaded document path
-        // Note: Excluding itinerary as it doesn't exist in current schema
-      }])
+      .insert([touristDataToInsert])
       .select(); // Return the inserted data
 
     if (error) {
